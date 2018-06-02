@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.urls import reverse_lazy
 from django.views import generic
+
+from .forms import RegistrationForm
 
 
 def login_view(request):
@@ -26,18 +28,19 @@ def login_view(request):
 def register(request):
     template = 'accounts/register.html'
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            username = request.POST['username']
-            password = request.POST['password1']
-            print(username, password)
-            user = authenticate(username=username,
-                                password=password)
-            login(request, user)
+            # username = request.POST['email']
+            # password = request.POST['password1']
+            # print("-"*50)
+            # print(username, password)
+            # user = authenticate(username=username,
+            #                     password=password)
+            # login(request, user)
             return redirect('/')
         return render(request, template, {'form': form})
-    form = UserCreationForm()
+    form = RegistrationForm()
     if request.user.is_authenticated:
         return redirect('/')
     return render(request, template, {'form': form})

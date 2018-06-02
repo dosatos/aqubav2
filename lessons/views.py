@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from accounts.models import Action
+# from accounts.models import Action
 from .models import Question
 import uuid
 
@@ -12,8 +12,10 @@ def index(request):
 
 
 def question(request, qid):
+    print("-"*50)
+    print(qid)
     template = "lessons/question.html"
-    question = get_object_or_404(Question, qid=uuid.UUID(qid))
+    question = get_object_or_404(Question, qid=qid)
     args = {"question": question,
             "solved": False}
     solved = Action.objects.filter(user_id=request.user.pk).values_list('qid', flat=True)
