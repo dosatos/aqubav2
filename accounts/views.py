@@ -4,24 +4,25 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.urls import reverse_lazy
 from django.views import generic
 
-from .forms import RegistrationForm
+from .forms import RegistrationForm, CustomUserLoginForm
+from accounts.models import CustomUser
 
 
 def login_view(request):
     template = 'accounts/login.html'
     if request.method == 'POST':
+        form = CustomUserLoginForm(request.POST)
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(username=username,
-                            password=password)
+        user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active:
             login(request, user)
             return redirect ('/')
-        form = AuthenticationForm(request.POST)
-        return render(request, template, {'form': form})
+        context = {'form': form, 'message': 'User or password is incorrect.'}
+        return render(request, template, context)
     if request.user.is_authenticated:
         return redirect('/')
-    form = AuthenticationForm()
+    form = CustomUserLoginForm()
     return render(request, template, {'form': form})
 
 
@@ -58,9 +59,22 @@ def profile(request):
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, form.user)
-            print('*'*50)
-            print(request.path)
             return redirect(request.path)
     form = PasswordChangeForm(user=request.user)
     context = {'form': form}
     return render(request, template, context)
+
+
+def authenticate_user(username, password):
+    # http://thepythondjango.com/creating-custom-user-model-and-custom-authentication-in-django/
+    try:
+        user = CustomUser.objects.get(username=username)
+        print(user, type(user))
+        print(user, user.is_active)
+        if user.check_password(password):
+            return user
+        else:
+            return None
+    except CustomUser.DoesNotExist:
+        print("Such user not found")
+        return None

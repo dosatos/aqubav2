@@ -1,7 +1,36 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from lessons.models import Question, Answer
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, username, password=None):
+        """
+        Creates and saves a User with the given username, email, and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email='balgabekov9@gmail.com', password=None):
+        """
+        Creates and saves a superuser with the given username, email, and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
+        user = self.create_user(email, username, password)
+        user.is_superuser = True
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
 
 
 class CustomUser(AbstractBaseUser):
@@ -9,20 +38,37 @@ class CustomUser(AbstractBaseUser):
     first_name = models.CharField(max_length=45)
     second_name = models.CharField(max_length=45)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True,)
-    # progress = models.ForeignKey(Progress, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [] # Email & Password are required by default.
 
-    # use managers
-    # def get_progress(self, date_start, date_end):
-    #     return self.progress.
+    objects = CustomUserManager()
+
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
 
 
 class Progress(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     correct = models.BooleanField()
-    time_spent = models.DurationField()
     time_started = models.DateTimeField()
     time_finished = models.DateTimeField(auto_now_add=True)
+    time_spent = models.FloatField()

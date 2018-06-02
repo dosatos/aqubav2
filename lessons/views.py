@@ -1,14 +1,31 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Question
+from .models import Question, Answer
 from accounts.models import Progress
 import uuid
 import datetime
 
 
+def add_questions(request):
+    q1 = Question(title="x + 3 = x",
+                  text="Sole for x: x + 3 = x")
+    q1.save()
+    a11 = Answer(question=q1, content='1, 2', correct=True)
+    a11.save()
+    a12 = Answer(question=q1, content='0', correct=False)
+    a12.save()
+    q2 = Question(title="x - 1 = x",
+                  text="Sole for x: x + 3 = x")
+    q2.save()
+    a21 = Answer(question=q2, content='3', correct=True)
+    a21.save()
+    a22 = Answer(question=q2, content='-3', correct=False)
+    a22.save()
+    return redirect('/')
+
+
 def index(request):
     template = "lessons/index.html"
     questions = Question.objects.all()
-    print(questions)
     args = {"questions": questions}
     return render(request, template, args)
 
@@ -25,8 +42,8 @@ def question(request, qid):
         else:
             context = {'message': 'Please, authorize first.'}
             return redirect('.', context)
-    # non-post method
-    request.session.set_expiry(5)
+    # non-POST method
+    request.session.set_expiry(360)
     request.session['time_start'] = str(datetime.datetime.now())
     return render(request, template, context)
 
@@ -39,25 +56,20 @@ def validate_answer_choice(request, question):
     :rtype: dict
 
     """
-    # saves progress history
-    # generates message if correct
-    # cannot solve again if already solved
-
     choice = question.answer_set.get(content=request.POST['choice'])
-    print('--------------------------------------------------------')
     time_started = get_time_from_str(request.session['time_start'])
-    print("<<<<<<<<<<<<<<<<", time_started)
     time_finished = datetime.datetime.now()
-    time_spent = time_finished - time_started
+    time_spent = (time_finished - time_started).total_seconds()
     correct = True if choice.correct else False
-    progress = Progress(question=question,
+    progress = Progress(user=request.user,
+                        question=question,
                         answer=choice,
                         correct=correct,
                         time_spent=time_spent,
                         time_started=time_started,
                         time_finished=time_finished)
     progress.save()
-    return {}
+    return {'question': question}
 
 
 # to helper.py

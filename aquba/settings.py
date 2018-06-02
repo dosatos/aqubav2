@@ -123,3 +123,6 @@ STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTHENTICATION_BACKENDS = ('accounts.backends.MyAuthBackend','django.contrib.auth.backends.ModelBackend',)
