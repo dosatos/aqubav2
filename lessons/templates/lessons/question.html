@@ -3,4 +3,23 @@
 {% block content %}
     <h1> {{ question.title }} </h1>
     <p> {{ question.text }} </p>
+    <form action="." method="POST">
+        {% csrf_token %}
+        {% if solved %}
+            {% for answer in question.answer_set.all %}
+                {% if answer.id == ans_id %}
+                    <div style="color: red; display:inline-block;">{{ answer.content }}</div>
+                {% else %}
+                    <div style="display:inline-block;">{{ answer.content }}</div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% for answer in question.answer_set.all %}
+                <input type="submit" name="choice_content" value="{{ answer.content }}">
+            {% endfor %}
+        {% endif %}
+    </form>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'lessons/base.html' %}
+
+{% block content %}
+    {% if not request.user.is_authenticated %}
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit"> Login </button>
+    </form>
+    {% else %}
+        <p> Hello, {{ request.user.username}}! </p>
+    {% endif %}
+{% endblock %}
