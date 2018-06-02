@@ -1,10 +1,12 @@
 {% extends 'lessons/base.html' %}
 
+{% block title %} Main {% endblock %}
+
 {% block content %}
     {% for question in questions %}
         <a href="/{{ question.qid }}">
             <h3>{{ question.title }}</h3>
         </a>
-        <p>{{ question.text }}</p>
+        <p>{{ question.text|truncatechars:35 }}</p>
     {% endfor %}
 {% endblock %}

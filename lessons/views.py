@@ -1,47 +1,65 @@
 from django.shortcuts import render, get_object_or_404, redirect
-# from accounts.models import Action
 from .models import Question
+from accounts.models import Progress
 import uuid
+import datetime
 
 
 def index(request):
     template = "lessons/index.html"
     questions = Question.objects.all()
+    print(questions)
     args = {"questions": questions}
     return render(request, template, args)
 
 
 def question(request, qid):
-    print("-"*50)
-    print(qid)
     template = "lessons/question.html"
     question = get_object_or_404(Question, qid=qid)
-    args = {"question": question,
-            "solved": False}
-    solved = Action.objects.filter(user_id=request.user.pk).values_list('qid', flat=True)
-    if str(question.qid) in solved:
-        args['solved'] = True
-        args['ans_id'] = Action.objects.get(user_id=request.user.pk,
-                                            qid=str(question.qid)).answer_id
-    if request.method == "POST":
-        correct_answer = question.answer_set.get(correct=True)
+    context = {'question': question}
+
+    if request.method == 'POST':
         if request.user.is_authenticated:
-            ans_content = request.POST['choice_content']
-            ans = question.answer_set.get(content=ans_content)
-            if ans_content == correct_answer.content:
-                args['message'] = 'Correct'
-                correct = True
-            else:
-                args['message'] = 'Incorrect'
-                correct = False
-            if not str(question.qid) in solved:
-                action = Action(
-                    user_id=request.user.pk,
-                    qid=str(question.qid),
-                    answer_id=ans.id,
-                    correct=correct)
-                action.save()
+            context = validate_answer_choice(request, question)
+            return render(request, template, context)
         else:
-            args['message'] = 'Please, authorize first.'
-        return redirect('.', args)
-    return render(request, template, args)
+            context = {'message': 'Please, authorize first.'}
+            return redirect('.', context)
+    # non-post method
+    request.session.set_expiry(5)
+    request.session['time_start'] = str(datetime.datetime.now())
+    return render(request, template, context)
+
+
+def validate_answer_choice(request, question):
+    """
+    This function validates the answer choice, saves the progress history,
+    and returns appropriate message in the context
+
+    :rtype: dict
+
+    """
+    # saves progress history
+    # generates message if correct
+    # cannot solve again if already solved
+
+    choice = question.answer_set.get(content=request.POST['choice'])
+    print('--------------------------------------------------------')
+    time_started = get_time_from_str(request.session['time_start'])
+    print("<<<<<<<<<<<<<<<<", time_started)
+    time_finished = datetime.datetime.now()
+    time_spent = time_finished - time_started
+    correct = True if choice.correct else False
+    progress = Progress(question=question,
+                        answer=choice,
+                        correct=correct,
+                        time_spent=time_spent,
+                        time_started=time_started,
+                        time_finished=time_finished)
+    progress.save()
+    return {}
+
+
+# to helper.py
+def get_time_from_str(time):
+    return datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S.%f')

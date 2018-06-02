@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
-# from lessons.models import Question, Answer
+from lessons.models import Question, Answer
 
 
 class CustomUser(AbstractBaseUser):
@@ -19,10 +19,10 @@ class CustomUser(AbstractBaseUser):
     #     return self.progress.
 
 
-# class Progress(models.Model):
-#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-#     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-#     correct = models.BooleanField()
-#     time_spent = models.DurationField()
-#     time_started = models.DateTimeField()
-#     time_finished = models.DateTimeField(auto_now_add=True)
+class Progress(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    correct = models.BooleanField()
+    time_spent = models.DurationField()
+    time_started = models.DateTimeField()
+    time_finished = models.DateTimeField(auto_now_add=True)

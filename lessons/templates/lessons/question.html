@@ -1,5 +1,7 @@
 {% extends 'lessons/base.html' %}
 
+{% block title %} Question {% endblock %}
+
 {% block content %}
     <h1> {{ question.title }} </h1>
     <p> {{ question.text }} </p>
@@ -15,7 +17,7 @@
             {% endfor %}
         {% else %}
             {% for answer in question.answer_set.all %}
-                <input type="submit" name="choice_content" value="{{ answer.content }}">
+                <input type="submit" name="choice" value="{{ answer.content }}">
             {% endfor %}
         {% endif %}
     </form>
