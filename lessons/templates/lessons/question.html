@@ -5,19 +5,20 @@
 {% block content %}
     <h1> {{ question.title }} </h1>
     <p> {{ question.text }} </p>
+    <p>{{solved}}</p>
     <form action="." method="POST">
         {% csrf_token %}
         {% for answer in question.answer_set.all %}
-            {% if guess %}
-                {% if correct and answer.id == guess.id %}
-                    <div class="answer-button correct">{{ answer.content }}</div>
-                {% elif correct and answer.id == guess.id %}
-                    <div class="answer-button incorrect">{{ answer.content }}</div>
+            {% if choice %}
+                {% if correct and answer.id == choice.id %}
+                    <div disabled class="btn btn-success">{{ answer.content }}</div>
+                {% elif answer.id == choice.id %}
+                    <div disabled class="btn btn-danger">{{ answer.content }}</div>
                 {% else %}
-                    <div class="answer-button">{{ answer.content }}</div>
+                    <div disabled class="btn btn-default">{{ answer.content }}</div>
                 {% endif %}
             {% else %}
-                    <input class="answer-button" type="submit" name="choice" value="{{ answer.content }}">
+                    <input class="btn btn-default" type="submit" name="choice" value="{{ answer.content }}">
             {% endif %}
         {% endfor %}
     </form>

@@ -1,9 +1,13 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Question, Answer
-from accounts.models import Progress
 import uuid
 import datetime
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+
+from .models import Question, Answer
+from accounts.models import Progress
+
 
 
 def add_questions(request):
@@ -35,25 +39,32 @@ def index(request):
 def question(request, qid):
     template = "lessons/question.html"
     question = get_object_or_404(Question, qid=qid)
-    context = {'question': question}
-
-    if request.method == 'POST':
-        context = validate_answer_choice(request, question)
-        return redirect(request.path, context)
-    # non-POST method
-    request.session.set_expiry(3600)  # update the session + 10 hours
+    context = { 'question': question }
+    try: # check if this question was approached before
+        last_attempt = Progress.objects.filter(user=request.user, question=question).order_by('-time_finished')[0]
+    except IndexError: # if not approached
+        last_attempt = None
+    # process POST request if not approached yet
+    if not last_attempt:
+        if request.method == 'POST':
+            context = validate_answer_choice(request, context)
+            return render(request, template, context)
+    else:
+        context['choice'] = last_attempt.answer
+        context['correct'] = last_attempt.correct
     request.session['time_start'] = str(datetime.datetime.now())
     return render(request, template, context)
 
 
-def validate_answer_choice(request, question):
+def validate_answer_choice(request, context):
     """
     This function validates the answer choice, saves the progress history,
     and returns appropriate message in the context
 
-    :rtype: dict
+    :return: dict
 
     """
+    question = context['question']
     choice = question.answer_set.get(content=request.POST['choice'])
     time_started = get_time_from_str(request.session['time_start'])
     time_finished = datetime.datetime.now()
@@ -67,11 +78,8 @@ def validate_answer_choice(request, question):
                         time_started=time_started,
                         time_finished=time_finished)
     progress.save()
-    context = {
-        'question': question,
-        'guess': choice,
-        'correct': correct
-    }
+    context['choice'] = choice
+    context['correct'] = correct
     return context
 
 

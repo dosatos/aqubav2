@@ -1,6 +1,5 @@
-html {
+* {
     font-family: Lato;
-    color: red;
 }
 
 .nav {
@@ -14,9 +13,9 @@ html {
 }
 
 .correct {
-    color: green;
+    background-color: green;
 }
 
-.incorrectw {
-    color: red;
+.incorrect {
+    background-color: red;
 }
