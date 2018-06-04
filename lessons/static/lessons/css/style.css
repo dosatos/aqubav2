@@ -1,0 +1,22 @@
+html {
+    font-family: Lato;
+    color: red;
+}
+
+.nav {
+    border: red solid 1px;
+    background-color: lightblue;
+}
+
+.answer-button {
+    display:inline-block;
+    background-color: #ffffff;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrectw {
+    color: red;
+}

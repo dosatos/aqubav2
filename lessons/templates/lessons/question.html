@@ -7,19 +7,19 @@
     <p> {{ question.text }} </p>
     <form action="." method="POST">
         {% csrf_token %}
-        {% if solved %}
-            {% for answer in question.answer_set.all %}
-                {% if answer.id == ans_id %}
-                    <div style="color: red; display:inline-block;">{{ answer.content }}</div>
+        {% for answer in question.answer_set.all %}
+            {% if guess %}
+                {% if correct and answer.id == guess.id %}
+                    <div class="answer-button correct">{{ answer.content }}</div>
+                {% elif correct and answer.id == guess.id %}
+                    <div class="answer-button incorrect">{{ answer.content }}</div>
                 {% else %}
-                    <div style="display:inline-block;">{{ answer.content }}</div>
+                    <div class="answer-button">{{ answer.content }}</div>
                 {% endif %}
-            {% endfor %}
-        {% else %}
-            {% for answer in question.answer_set.all %}
-                <input type="submit" name="choice" value="{{ answer.content }}">
-            {% endfor %}
-        {% endif %}
+            {% else %}
+                    <input class="answer-button" type="submit" name="choice" value="{{ answer.content }}">
+            {% endif %}
+        {% endfor %}
     </form>
     {% if message %}
         <p>{{ message }}</p>

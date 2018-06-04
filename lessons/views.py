@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from .models import Question, Answer
 from accounts.models import Progress
 import uuid
@@ -30,20 +31,17 @@ def index(request):
     return render(request, template, args)
 
 
+@login_required
 def question(request, qid):
     template = "lessons/question.html"
     question = get_object_or_404(Question, qid=qid)
     context = {'question': question}
 
     if request.method == 'POST':
-        if request.user.is_authenticated:
-            context = validate_answer_choice(request, question)
-            return render(request, template, context)
-        else:
-            context = {'message': 'Please, authorize first.'}
-            return redirect('.', context)
+        context = validate_answer_choice(request, question)
+        return redirect(request.path, context)
     # non-POST method
-    request.session.set_expiry(360)
+    request.session.set_expiry(3600)  # update the session + 10 hours
     request.session['time_start'] = str(datetime.datetime.now())
     return render(request, template, context)
 
@@ -69,7 +67,12 @@ def validate_answer_choice(request, question):
                         time_started=time_started,
                         time_finished=time_finished)
     progress.save()
-    return {'question': question}
+    context = {
+        'question': question,
+        'guess': choice,
+        'correct': correct
+    }
+    return context
 
 
 # to helper.py
