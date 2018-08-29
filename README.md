@@ -1,5 +1,5 @@
 ###### Practicing TDD Skills with Django
-#### An adaptive question bank
+#### just a question bank
 
 
 To run the web-server 
@@ -10,5 +10,5 @@ docker-compose up
 
 In the other terminal window
 ```bash
-docker-compose exec web sh
+docker-compose exec web bash
 ``` 

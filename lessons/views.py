@@ -9,7 +9,6 @@ from .models import Question, Answer
 from accounts.models import Progress
 
 
-
 def add_questions(request):
     q1 = Question(title="x + 3 = x",
                   text="Sole for x: x + 3 = x")
