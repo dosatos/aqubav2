@@ -4,9 +4,11 @@
 
 {% block content %}
     {% for question in questions %}
+    <div class="quest-container">
         <a href="/{{ question.qid }}">
             <h3>{{ question.title }}</h3>
         </a>
         <p>{{ question.text|truncatechars:35 }}</p>
+    </div>
     {% endfor %}
 {% endblock %}
