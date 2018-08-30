@@ -5,27 +5,57 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'lessons/css/style.css' %}" />
-
-
-    <title>{% block title %}{% endblock %}</title>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'lessons/css/style.css' %}" />-->
+    {% block css %}{% endblock %}
+    <title> {% block title %} {% endblock %} </title>
 </head>
 <body>
-    <div class="nav">
-        <ul class="nav nav-pills">
-          <li role="presentation" class="active"><a href="/">Main</a></li>
-          <li role="presentation"><a href="#">History</a></li>
-            {% if not request.user.is_authenticated %}
-                <li role="presentation"><a href="/accounts/login">Login</a></li>
-                <li role="presentation"><a href="/accounts/register">Sign Up</a></li>
-            {% else  %}
-                <li role="presentation"><a href="/accounts/profile">Profile</a></li>
-                <li role="presentation"><a href="/accounts/logout">Logout</a></li>
-            {% endif %}
-        </ul>
+    <div class="row nav-wrapper">
+
+        <div class="col-xs-1">
+            <ul class="nav navbar-nav pull-left">
+                <li role="presentation"><a class="btn-sm logo" href="/">AQUBA</a></li>
+            </ul>
+        </div>
+
+        <div class="col-xs-10 collapse navbar-collapse">
+            <form class="navbar-form custom-search-form" role="search">
+                <div class="input-group search-box">
+                  <input type="text" class="form-control" placeholder="Search for...">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">Go!</button>
+                  </span>
+                </div><!-- /input-group -->
+            </form>
+
+            <div>
+                <ul class="nav nav-tabs">
+                    <li role="presentation" class="{% if request.path == '/' %} active {% endif %}"><a class="btn-sm" href="/">All</a></li>
+                    {% if user.is_authenticated %}
+                        <!-- <li role="presentation" class="{% if request.path == '/progress/' %} active {% endif %}"><a class="btn-sm" href="/progress/">{{ request.user.username }} | Level: 1, Points: 165</a></li> -->
+                        <li role="presentation" class="{% if request.path == '/progress/' %} active {% endif %}"><a class="btn-sm" href="/progress/">{{ request.user.username }}</a></li>
+                    {% else %}
+                        <li role="presentation" class="{% if request.path == '/progress/' %} active {% endif %}"><a class="btn-sm" href="/progress/">Progress</a></li>
+                    {% endif %}
+                    {% if not request.user.is_authenticated %}
+                    <li role="presentation" class="{% if request.path == '/accounts/login/' %} active {% endif %}"><a class="btn-sm nav-text" href="/accounts/login">Login</a></li>
+                    <li role="presentation" class="{% if request.path == '/accounts/register/' %} active {% endif %}"><a class="btn-sm nav-text" href="/accounts/register">Sign Up</a></li>
+                    {% else  %}
+                    <li role="presentation" class="{% if request.path == '/accounts/logout/' %} active {% endif %}"><a class="btn-sm nav-text" href="/accounts/logout">Logout</a></li>
+                    <li role="presentation" class="{% if request.path == '/accounts/profile/' %} active {% endif %}"><a class="btn-sm nav-text" href="/accounts/profile">Change Password</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
     </div>
     {% if request.user.is_authenticated %}
-        <h3 class="text-center text-uppercase active bg-info">Hello, {{ request.user.username }} !</h3>
+    <div class="row">
+        <div class="col-xs-offset-2 col-xs-8 pull-right">
+            <h5></h5>
+        </div>
+    </div>
+
     {% endif %}
     {% block content %}
     {% endblock %}

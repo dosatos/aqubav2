@@ -1,0 +1,40 @@
+{% extends 'lessons/base.html' %}
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'lessons/css/index.css' %}" />
+{% endblock %}
+
+{% block title %} History {% endblock %}
+
+{% block content %}
+    <div class="col-xs-10 col-xs-offset-1 accuracy-message">
+        <h5 class="pull-left">Average Accuracy: {{ accuracy }}</h5>
+    </div>
+    <div class="col-xs-10 col-xs-offset-1">
+        <table class="table table-bordered text-center">
+            <tr class="info">
+                <th class="h4 text-center"> # </th>
+                <th class="h4 text-center"> Date </th>
+                <th class="h4 text-center"> Question </th>
+                <th class="h4 text-center"> Time Spent</th>
+            </tr>
+            {% for row in progress %}
+                {% if row.correct %}
+                    <tr class="success">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ row.time_started.date }}</td>
+                        <td>{{ row.question }}</td>
+                        <td>{{ row.time_spent }}</td>
+                    </tr>
+                {% else %}
+                    <tr class="danger">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ row.time_started.date }}</td>
+                        <td>{{ row.question }}</td>
+                        <td>{{ row.time_spent }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

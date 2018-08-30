@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('add_questions/', views.add_questions),
-    path('<str:qid>/', views.question),
-    re_path(r'^$', views.index),
+    path('progress/', views.progress_view, name='progress'),
+    path('<str:qid>/', views.question, name='question'),
+    re_path(r'^$', views.index, name='index'),
 ]

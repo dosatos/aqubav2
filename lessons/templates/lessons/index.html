@@ -1,14 +1,24 @@
 {% extends 'lessons/base.html' %}
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'lessons/css/index.css' %}" />
+{% endblock %}
 
-{% block title %}Aquba{% endblock %}
+{% block title %} Main {% endblock %}
 
 {% block content %}
-    {% for question in questions %}
-    <div class="quest-container">
-        <a href="/{{ question.qid }}">
-            <h3>{{ question.title }}</h3>
-        </a>
-        <p>{{ question.text|truncatechars:35 }}</p>
+    <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-1">
+            <h5 class="questions-count-text"> About {{ progress_count }} questions were solved in the web-site </h5>
+        </div>
+        {% for question in questions %}
+        <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-1">
+            <a href="/{{ question.qid }}">
+                <h4 class="title">{{ question.title }}</h4>
+            </a>
+            <h5 class="category">Category: Equations | 25 points</h5>
+            <p class="text">{{ question.text|truncatechars:100 }}</p>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 {% endblock %}

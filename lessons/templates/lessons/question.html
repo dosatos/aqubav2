@@ -1,28 +1,35 @@
 {% extends 'lessons/base.html' %}
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'lessons/css/question.css' %}" />
+{% endblock %}
 
 {% block title %} Question {% endblock %}
 
 {% block content %}
-    <h1> {{ question.title }} </h1>
-    <p> {{ question.text }} </p>
-    <p>{{solved}}</p>
-    <form action="." method="POST">
-        {% csrf_token %}
-        {% for answer in question.answer_set.all %}
-            {% if choice %}
-                {% if correct and answer.id == choice.id %}
-                    <div disabled class="btn btn-success">{{ answer.content }}</div>
-                {% elif answer.id == choice.id %}
-                    <div disabled class="btn btn-danger">{{ answer.content }}</div>
-                {% else %}
-                    <div disabled class="btn btn-default">{{ answer.content }}</div>
-                {% endif %}
-            {% else %}
-                    <input class="btn btn-default" type="submit" name="choice" value="{{ answer.content }}">
-            {% endif %}
-        {% endfor %}
-    </form>
-    {% if message %}
-        <p>{{ message }}</p>
-    {% endif %}
+<div class="row">
+    <div class="question-wrapper">
+        <h1> {{ question.title }} </h1>
+        <p> {{ question.text }} </p>
+        <p>{{solved}}</p>
+        <form action="." method="POST">
+            {% csrf_token %}
+            <div>
+                {% for answer in question.answer_set.all %}
+                    {% if choice %}
+                        {% if correct and answer.id == choice.id %}
+                            <div disabled class="btn btn-success">{{ answer.content }}</div>
+                        {% elif answer.id == choice.id %}
+                            <div disabled class="btn btn-danger">{{ answer.content }}</div>
+                        {% else %}
+                            <div disabled class="btn btn-default">{{ answer.content }}</div>
+                        {% endif %}
+                    {% else %}
+                            <input class="btn btn-default" type="submit" name="choice" value="{{ answer.content }}">
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
