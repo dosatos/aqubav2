@@ -11,4 +11,5 @@ docker-compose up
 In the other terminal window
 ```bash
 docker-compose exec web bash
+python manage.py migrate
 ``` 
