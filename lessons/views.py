@@ -1,10 +1,10 @@
 import uuid
 import datetime
 
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 
 from .models import Question, Answer
 from accounts.models import Progress
@@ -113,5 +113,5 @@ def get_time_from_str(time):
 
 
 def get_accuracy(progress):
-    """ calculates average accuracy of a given student """
-    return progress.aggregate(Sum('correct'))['correct__sum'] / progress.count()
+    return progress.aggregate(Avg('correct'))['correct__avg']
+    # return progress.aggregate(Sum('correct'))['correct__sum'] / progress.count()

@@ -3,6 +3,13 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from lessons.models import Question, Answer
 
+
+CORRECTNESS_CHOICES = (
+    (1, True),
+    (0, False),
+)
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         """
@@ -48,19 +55,13 @@ class CustomUser(AbstractBaseUser):
     objects = CustomUserManager()
 
     def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
         return True
 
     def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
         return True
 
     @property
     def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
         return self.is_admin
 
 
@@ -68,7 +69,7 @@ class Progress(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    correct = models.BooleanField()
+    correct = models.IntegerField(default=0, choices=CORRECTNESS_CHOICES)
     time_started = models.DateTimeField()
     time_finished = models.DateTimeField(auto_now_add=True)
     time_spent = models.FloatField()
